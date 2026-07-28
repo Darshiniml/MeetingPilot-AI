@@ -11,6 +11,7 @@ from app.api.system_routes import router as system_router
 from app.config.settings import get_settings
 from app.database.initialization import create_database_tables
 from app.transcription.whisper_service import get_whisper_service
+from app.websocket.transcript_socket import router as transcript_socket_router
 
 
 @asynccontextmanager
@@ -44,6 +45,7 @@ def create_app() -> FastAPI:
 
     application.include_router(system_router)
     application.include_router(meeting_router)
+    application.include_router(transcript_socket_router)
     return application
 
 
