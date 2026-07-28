@@ -1,28 +1,33 @@
+"""FastAPI application composition for MeetingPilot AI."""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(
-    title="MeetingPilot AI API",
-    version="1.0.0",
-    description="Backend API for MeetingPilot AI"
-)
+from app.api.meeting_routes import router as meeting_router
+from app.api.system_routes import router as system_router
+from app.config.settings import get_settings
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-@app.get("/")
-def root():
-    return {
-        "message": "🚀 MeetingPilot AI Backend is Running!"
-    }
+def create_app() -> FastAPI:
+    """Create and configure the MeetingPilot ASGI application."""
+    settings = get_settings()
 
-@app.get("/health")
-def health():
-    return {
-        "status": "healthy"
-    }
+    application = FastAPI(
+        title=settings.app_name,
+        version=settings.app_version,
+    )
+
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.allowed_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    application.include_router(system_router)
+    application.include_router(meeting_router)
+    return application
+
+
+app = create_app()
