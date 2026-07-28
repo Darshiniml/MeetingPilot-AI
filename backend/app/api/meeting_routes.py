@@ -4,8 +4,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from app.core.dependencies import get_meeting_service
 from app.schemas.meeting_schema import MeetingActionResponse, MeetingStatusResponse
-from app.services.meeting_service import MeetingService, get_meeting_service
+from app.services.meeting_service import MeetingService
 
 
 router = APIRouter(prefix="/meeting", tags=["meeting"])

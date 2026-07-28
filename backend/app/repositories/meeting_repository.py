@@ -1,6 +1,7 @@
 """SQLAlchemy persistence operations for meetings."""
 
 from collections.abc import Sequence
+from datetime import datetime
 
 from sqlalchemy import Select, select
 from sqlalchemy.exc import SQLAlchemyError
@@ -21,9 +22,14 @@ class MeetingRepository:
         *,
         title: str,
         status: MeetingStatus = MeetingStatus.CREATED,
+        started_at: datetime | None = None,
     ) -> Meeting:
         """Create, persist, and return a new meeting record."""
-        meeting = Meeting(title=title, status=status)
+        meeting = Meeting(
+            title=title,
+            status=status,
+            started_at=started_at,
+        )
         self._session.add(meeting)
         return self._commit_and_refresh(meeting)
 
@@ -36,12 +42,21 @@ class MeetingRepository:
 
     def get_running_meeting(self) -> Meeting | None:
         """Return the most recently started running meeting, if one exists."""
+        running_meetings = self.list_running_meetings(limit=1)
+        return running_meetings[0] if running_meetings else None
+
+    def list_running_meetings(self, *, limit: int = 2) -> Sequence[Meeting]:
+        """Return running meetings to support lifecycle integrity checks."""
+        if not 1 <= limit <= 500:
+            raise ValueError("limit must be between 1 and 500")
+
         statement: Select[tuple[Meeting]] = (
             select(Meeting)
             .where(Meeting.status == MeetingStatus.RUNNING)
             .order_by(Meeting.started_at.desc(), Meeting.id.desc())
+            .limit(limit)
         )
-        return self._session.execute(statement).scalars().first()
+        return self._session.execute(statement).scalars().all()
 
     def update_meeting(self, meeting: Meeting) -> Meeting:
         """Persist changes already applied to a managed meeting entity."""
