@@ -1,11 +1,22 @@
 """FastAPI application composition for MeetingPilot AI."""
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.meeting_routes import router as meeting_router
 from app.api.system_routes import router as system_router
 from app.config.settings import get_settings
+from app.database.initialization import create_database_tables
+
+
+@asynccontextmanager
+async def lifespan(_application: FastAPI) -> AsyncIterator[None]:
+    """Initialize local infrastructure before the API accepts requests."""
+    create_database_tables()
+    yield
 
 
 def create_app() -> FastAPI:
@@ -15,6 +26,7 @@ def create_app() -> FastAPI:
     application = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
+        lifespan=lifespan,
     )
 
     application.add_middleware(
