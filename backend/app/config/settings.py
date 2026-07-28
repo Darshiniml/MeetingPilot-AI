@@ -12,6 +12,12 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     cors_origins: str = "http://localhost:5173"
     database_url: str = "sqlite:///./meetingpilot.db"
+    whisper_model_size: str = "base"
+    whisper_device: str = "cpu"
+    whisper_compute_type: str = "int8"
+    whisper_beam_size: int = 5
+    whisper_vad_filter: bool = True
+    whisper_load_on_startup: bool = True
 
     model_config = SettingsConfigDict(
         env_file=".env",

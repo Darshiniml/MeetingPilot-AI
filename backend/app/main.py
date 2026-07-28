@@ -10,13 +10,18 @@ from app.api.meeting_routes import router as meeting_router
 from app.api.system_routes import router as system_router
 from app.config.settings import get_settings
 from app.database.initialization import create_database_tables
+from app.transcription.whisper_service import get_whisper_service
 
 
 @asynccontextmanager
 async def lifespan(_application: FastAPI) -> AsyncIterator[None]:
     """Initialize local infrastructure before the API accepts requests."""
     create_database_tables()
+    settings = get_settings()
+    if settings.whisper_load_on_startup:
+        get_whisper_service().warmup()
     yield
+    get_whisper_service().shutdown()
 
 
 def create_app() -> FastAPI:

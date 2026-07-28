@@ -7,4 +7,5 @@ pydantic
 pydantic-settings
 numpy
 soundcard
+faster-whisper
 websockets
