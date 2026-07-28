@@ -1,6 +1,8 @@
 """Database engine configuration."""
 
-from sqlalchemy import create_engine
+from typing import Any
+
+from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 
 from app.config.settings import get_settings
@@ -22,3 +24,17 @@ def create_database_engine() -> Engine:
 
 
 engine = create_database_engine()
+
+
+def _enable_sqlite_foreign_keys(
+    dbapi_connection: Any,
+    _connection_record: Any,
+) -> None:
+    """Enable SQLite foreign-key enforcement for every application connection."""
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
+
+if engine.url.get_backend_name() == "sqlite":
+    event.listen(engine, "connect", _enable_sqlite_foreign_keys)

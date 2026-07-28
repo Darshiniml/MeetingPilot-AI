@@ -3,11 +3,17 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Enum as SqlAlchemyEnum, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
+
+if TYPE_CHECKING:
+    from app.models.action_item import ActionItem
+    from app.models.summary import Summary
+    from app.models.transcript import Transcript
 
 
 def utc_now() -> datetime:
@@ -58,6 +64,23 @@ class Meeting(Base):
         nullable=False,
         default=utc_now,
         onupdate=utc_now,
+    )
+    transcripts: Mapped[list["Transcript"]] = relationship(
+        back_populates="meeting",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="Transcript.sequence_number",
+    )
+    summary: Mapped["Summary | None"] = relationship(
+        back_populates="meeting",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        uselist=False,
+    )
+    action_items: Mapped[list["ActionItem"]] = relationship(
+        back_populates="meeting",
+        cascade="all, delete-orphan",
+        lazy="selectin",
     )
 
 @dataclass(slots=True)
