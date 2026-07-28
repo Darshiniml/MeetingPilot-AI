@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     app_name: str = "MeetingPilot AI API"
     app_version: str = "1.0.0"
     cors_origins: str = "http://localhost:5173"
+    database_url: str = "sqlite:///./meetingpilot.db"
 
     model_config = SettingsConfigDict(
         env_file=".env",
