@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import MutableSet
+import asyncio
 from typing import Any
 
 from fastapi import WebSocket
@@ -13,11 +14,13 @@ class TranscriptSocketManager:
 
     def __init__(self) -> None:
         self._connections: MutableSet[WebSocket] = set()
+        self._event_loop: asyncio.AbstractEventLoop | None = None
 
     async def connect(self, websocket: WebSocket) -> None:
         """Register a new WebSocket client."""
         await websocket.accept()
         self._connections.add(websocket)
+        self._event_loop = asyncio.get_running_loop()
         await websocket.send_json({"type": "connected", "message": "Transcript stream connected"})
 
     async def disconnect(self, websocket: WebSocket) -> None:
@@ -35,6 +38,20 @@ class TranscriptSocketManager:
                 dead_connections.append(websocket)
         for websocket in dead_connections:
             self._connections.discard(websocket)
+
+    def dispatch_transcript(self, *, meeting_id: int, transcript: dict[str, Any]) -> None:
+        """Schedule a broadcast on the ASGI loop from either request or worker threads."""
+        if not self._connections or self._event_loop is None:
+            return
+        coroutine = self.broadcast_transcript(meeting_id=meeting_id, transcript=transcript)
+        try:
+            current_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            current_loop = None
+        if current_loop is self._event_loop:
+            current_loop.create_task(coroutine)
+            return
+        asyncio.run_coroutine_threadsafe(coroutine, self._event_loop).result(timeout=5)
 
 
 _transcript_socket_manager: TranscriptSocketManager | None = None

@@ -6,6 +6,8 @@ import TaskPanel from "../../components/tasks/TaskPanel";
 import ChatPanel from "../../components/chat/ChatPanel";
 
 function Dashboard() {
+  const [summary, setSummary] = useState<string | null>(null);
+
   return (
     <div className="flex min-h-screen bg-slate-950 text-white">
       <Sidebar />
@@ -15,11 +17,11 @@ function Dashboard() {
 
         <main className="flex-1 grid grid-cols-3 gap-6 p-6">
           <div className="col-span-2">
-            <TranscriptPanel />
+            <TranscriptPanel onSummaryGenerated={setSummary} />
           </div>
 
           <div className="space-y-6">
-            <SummaryPanel />
+            <SummaryPanel content={summary} />
             <TaskPanel />
             <ChatPanel />
           </div>
@@ -30,3 +32,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+import { useState } from "react";

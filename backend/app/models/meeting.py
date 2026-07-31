@@ -69,7 +69,7 @@ class Meeting(Base):
         back_populates="meeting",
         cascade="all, delete-orphan",
         lazy="selectin",
-        order_by="Transcript.sequence_number",
+        order_by="Transcript.chunk_index",
     )
     summary: Mapped["Summary | None"] = relationship(
         back_populates="meeting",
@@ -88,3 +88,4 @@ class MeetingState:
     """The current state of a single active meeting session."""
 
     running: bool = False
+    meeting_id: int | None = None

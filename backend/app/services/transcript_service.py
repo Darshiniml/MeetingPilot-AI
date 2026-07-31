@@ -1,6 +1,6 @@
 """Business logic for persisting chunk-level Whisper output."""
 
-import asyncio
+import logging
 from datetime import datetime
 from typing import Any
 
@@ -9,6 +9,9 @@ from app.models.transcript import Transcript
 from app.repositories.transcript_repository import TranscriptRepository
 from app.transcription.models import TranscriptionResult
 from app.websocket.manager import get_transcript_socket_manager
+
+
+logger = logging.getLogger(__name__)
 
 
 class TranscriptService:
@@ -33,6 +36,7 @@ class TranscriptService:
             language=whisper_result.language,
             confidence=sum(scores) / len(scores) if scores else None,
         )
+        logger.info("Transcript persisted", extra={"meeting_id": meeting_id, "transcript_id": transcript.id})
         self._broadcast_transcript(meeting_id=meeting_id, transcript=transcript)
         return transcript
 
@@ -48,11 +52,7 @@ class TranscriptService:
             "language": transcript.language,
             "confidence": transcript.confidence,
         }
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = None
-        if loop and loop.is_running():
-            loop.create_task(get_transcript_socket_manager().broadcast_transcript(meeting_id=meeting_id, transcript=payload))
-        else:
-            asyncio.run(get_transcript_socket_manager().broadcast_transcript(meeting_id=meeting_id, transcript=payload))
+        get_transcript_socket_manager().dispatch_transcript(
+            meeting_id=meeting_id, transcript=payload
+        )
+        logger.info("WebSocket broadcast dispatched", extra={"meeting_id": meeting_id, "transcript_id": transcript.id})

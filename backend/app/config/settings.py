@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     whisper_beam_size: int = 5
     whisper_vad_filter: bool = True
     whisper_load_on_startup: bool = True
+    summary_llm_provider: str = "ollama"
+    summary_llm_model: str = "llama3.2"
+    ollama_base_url: str = "http://127.0.0.1:11434"
 
     model_config = SettingsConfigDict(
         env_file=".env",

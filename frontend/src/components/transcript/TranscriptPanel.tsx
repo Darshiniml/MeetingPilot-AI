@@ -12,7 +12,11 @@ type TranscriptEntry = {
   confidence: number | null;
 };
 
-function TranscriptPanel() {
+type TranscriptPanelProps = {
+  onSummaryGenerated: (content: string | null) => void;
+};
+
+function TranscriptPanel({ onSummaryGenerated }: TranscriptPanelProps) {
   const [running, setRunning] = useState(false);
   const [transcripts, setTranscripts] = useState<TranscriptEntry[]>([]);
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -39,6 +43,7 @@ function TranscriptPanel() {
         return;
       }
 
+      console.debug("Frontend received transcript", data.transcript);
       setTranscripts((current) => [...current, data.transcript]);
     });
 
@@ -64,8 +69,13 @@ function TranscriptPanel() {
 
   const stopMeeting = async () => {
     try {
-      await api.post("/meeting/stop");
+      const response = await api.post("/meeting/stop");
       setRunning(false);
+      const meetingId = response.headers["x-meeting-id"];
+      if (meetingId) {
+        const summary = await api.get(`/meeting/${meetingId}/summary`);
+        onSummaryGenerated(summary.data.content);
+      }
     } catch (error) {
       console.error(error);
     }

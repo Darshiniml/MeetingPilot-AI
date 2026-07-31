@@ -20,6 +20,8 @@ class AudioChunk:
     source: AudioSource
     sample_rate: int
     frame_count: int
+    chunk_index: int
+    started_at: datetime
     created_at: datetime
 
 
@@ -69,14 +71,22 @@ class TemporaryWavChunkWriter:
         self._session_directory.mkdir(parents=True, exist_ok=True)
         self._chunk_number = 0
 
-    def write(self, samples: np.ndarray, *, source: AudioSource, sample_rate: int) -> AudioChunk:
+    def write(
+        self,
+        samples: np.ndarray,
+        *,
+        source: AudioSource,
+        sample_rate: int,
+        started_at: datetime | None = None,
+    ) -> AudioChunk:
         """Persist one PCM chunk as lossless 16-bit WAV audio."""
         normalized = samples.reshape((-1, 1)) if samples.ndim == 1 else samples
         pcm_samples = np.clip(normalized, -1.0, 1.0)
         pcm_samples = (pcm_samples * 32_767).astype("<i2")
         created_at = datetime.now(timezone.utc)
+        chunk_index = self._chunk_number
         path = self._session_directory / (
-            f"{source.value}_{self._chunk_number:05d}_{created_at:%Y%m%dT%H%M%SZ}.wav"
+            f"{source.value}_{chunk_index:05d}_{created_at:%Y%m%dT%H%M%SZ}.wav"
         )
         self._chunk_number += 1
         with wave.open(str(path), "wb") as wav_file:
@@ -89,5 +99,7 @@ class TemporaryWavChunkWriter:
             source=source,
             sample_rate=sample_rate,
             frame_count=len(pcm_samples),
+            chunk_index=chunk_index,
+            started_at=started_at or created_at,
             created_at=created_at,
         )

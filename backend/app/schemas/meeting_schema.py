@@ -11,6 +11,13 @@ class MeetingStatusResponse(BaseModel):
     running: bool = Field(
         ..., description="Whether the local MeetingPilot session is running."
     )
+class SummaryResponse(BaseModel):
+    """Public representation of a generated meeting summary."""
+
+    model_config = ConfigDict(frozen=True)
+
+    meeting_id: int
+    content: str
 
 
 class MeetingActionResponse(MeetingStatusResponse):
