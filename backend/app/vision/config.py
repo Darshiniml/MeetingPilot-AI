@@ -13,3 +13,5 @@ class VisionConfig:
     minimum_tile_area_ratio: float = 0.02
     ocr_interval_seconds: float = 5.0
     ocr_overlap_threshold: float = 0.5
+    speaker_smoothing_window: float = 1.5
+    speaker_threshold: float = 0.5

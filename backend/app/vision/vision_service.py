@@ -9,6 +9,8 @@ from app.vision.ocr_detector import OcrDetector
 from app.vision.participant_detector import ParticipantDetector
 from app.vision.screen_capture import ScreenCapture
 from app.vision.window_detector import MeetingWindowDetector
+from app.vision.active_speaker_detector import ActiveSpeakerDetector
+from app.vision.speaker_tracker import SpeakerTracker
 
 
 class VisionService:
@@ -20,6 +22,8 @@ class VisionService:
         window_detector: MeetingWindowDetector | None = None,
         participant_detector: ParticipantDetector | None = None,
         ocr_detector: OcrDetector | None = None,
+        active_speaker_detector: ActiveSpeakerDetector | None = None,
+        speaker_tracker: SpeakerTracker | None = None,
         config: VisionConfig | None = None,
     ) -> None:
         self._config = config or VisionConfig()
@@ -27,6 +31,12 @@ class VisionService:
         self._window_detector = window_detector or MeetingWindowDetector()
         self._participant_detector = participant_detector or ParticipantDetector(self._config)
         self._ocr_detector = ocr_detector or OcrDetector(gpu=False)
+        self._active_speaker_detector = active_speaker_detector or ActiveSpeakerDetector()
+        self._speaker_tracker = speaker_tracker or SpeakerTracker(
+            rise_time=0.25,
+            decay_time=self._config.speaker_smoothing_window,
+            active_threshold=self._config.speaker_threshold,
+        )
 
         # Cache mapping unique stable ID -> dict of details
         self._participant_cache: dict[str, dict] = {}
@@ -157,6 +167,21 @@ class VisionService:
                         p_name = "UNKNOWN"
                         p_conf = None
 
+                is_speaking_instant, speak_conf = self._active_speaker_detector.detect(
+                    frame.image,
+                    tile.bounding_box,
+                    frame.origin_x,
+                    frame.origin_y,
+                    meeting_window.platform_name,
+                )
+                
+                is_active, _ = self._speaker_tracker.update(
+                    p_id,
+                    is_speaking_instant,
+                    speak_conf,
+                    frame.timestamp,
+                )
+
                 final_participants.append(
                     Participant(
                         id=p_id,
@@ -165,6 +190,7 @@ class VisionService:
                         is_active_speaker=tile.is_active_speaker,
                         last_seen=frame.timestamp,
                         confidence=p_conf,
+                        is_active=is_active,
                     )
                 )
 
@@ -187,6 +213,21 @@ class VisionService:
                     p_name = "UNKNOWN"
                     p_conf = None
 
+                is_speaking_instant, speak_conf = self._active_speaker_detector.detect(
+                    frame.image,
+                    tile.bounding_box,
+                    frame.origin_x,
+                    frame.origin_y,
+                    meeting_window.platform_name,
+                )
+                
+                is_active, _ = self._speaker_tracker.update(
+                    p_id,
+                    is_speaking_instant,
+                    speak_conf,
+                    frame.timestamp,
+                )
+
                 final_participants.append(
                     Participant(
                         id=p_id,
@@ -195,6 +236,7 @@ class VisionService:
                         is_active_speaker=tile.is_active_speaker,
                         last_seen=frame.timestamp,
                         confidence=p_conf,
+                        is_active=is_active,
                     )
                 )
 
@@ -206,6 +248,14 @@ class VisionService:
         ]
         for key in prune_keys:
             del self._participant_cache[key]
+            
+        # Update missing speakers and prune tracker
+        seen_ids = {p.id for p in final_participants}
+        for key in list(self._speaker_tracker._states.keys()):
+            if key not in seen_ids:
+                self._speaker_tracker.update_inactive_missing(key, frame.timestamp)
+                
+        self._speaker_tracker.prune(max_idle_seconds=30.0, current_time=frame.timestamp)
 
         return VisionResult(
             frame=frame,

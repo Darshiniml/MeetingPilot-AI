@@ -44,6 +44,7 @@ class Participant:
     is_active_speaker: bool
     last_seen: datetime
     confidence: float | None = None
+    is_active: bool = False
 
 
 @dataclass(frozen=True, slots=True)
