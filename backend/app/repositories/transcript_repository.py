@@ -15,9 +15,9 @@ class TranscriptRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
 
-    def create_transcript(self, *, meeting_id: int, chunk_index: int, text: str, start_seconds: float, end_seconds: float, language: str, confidence: float | None) -> Transcript:
-        """Create and persist one Whisper transcription chunk."""
-        transcript = Transcript(meeting_id=meeting_id, chunk_index=chunk_index, text=text, start_seconds=start_seconds, end_seconds=end_seconds, language=language, confidence=confidence)
+    def create_transcript(self, *, meeting_id: int, chunk_index: int, segment_index: int, text: str, start_seconds: float, end_seconds: float, language: str, confidence: float | None, speaker_id: str | None, speaker_name: str | None, speaker_confidence: float | None) -> Transcript:
+        """Create and persist one Whisper transcription segment."""
+        transcript = Transcript(meeting_id=meeting_id, chunk_index=chunk_index, segment_index=segment_index, text=text, start_seconds=start_seconds, end_seconds=end_seconds, language=language, confidence=confidence, speaker_id=speaker_id, speaker_name=speaker_name, speaker_confidence=speaker_confidence)
         self._session.add(transcript)
         return self._commit_and_refresh(transcript)
 

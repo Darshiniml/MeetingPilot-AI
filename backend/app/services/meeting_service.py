@@ -1,6 +1,8 @@
 """Meeting lifecycle business logic."""
 
 import logging
+import time
+import threading
 from collections.abc import Callable
 from datetime import datetime
 from threading import RLock
@@ -11,7 +13,10 @@ from app.audio.devices import AudioSource
 from app.models.meeting import Meeting, MeetingState, MeetingStatus, utc_now
 from app.repositories.meeting_repository import MeetingRepository
 from app.services.summary_service import SummaryService
+from app.services.action_item_service import ActionItemService
 from app.transcription.whisper_service import WhisperService
+from app.vision.vision_service import get_vision_service
+from app.vision.speaker_repository import get_speaker_repository
 
 
 logger = logging.getLogger(__name__)
@@ -34,6 +39,7 @@ class MeetingService:
         whisper_service: WhisperService,
         chunk_processor_factory: Callable[..., Callable[[AudioChunk], None]],
         summary_service: SummaryService,
+        action_item_service: ActionItemService,
     ) -> None:
         """Initialize the service with its sole persistence collaborator."""
         self._meeting_repository = meeting_repository
@@ -41,6 +47,26 @@ class MeetingService:
         self._whisper_service = whisper_service
         self._chunk_processor_factory = chunk_processor_factory
         self._summary_service = summary_service
+        self._action_item_service = action_item_service
+        
+        self._vision_running = False
+        self._vision_thread: threading.Thread | None = None
+
+    def _vision_loop(self) -> None:
+        """Poll the vision service periodically and save results to the repository."""
+        vision_service = get_vision_service()
+        speaker_repo = get_speaker_repository()
+        speaker_repo.clear()
+        
+        while self._vision_running:
+            try:
+                result = vision_service.inspect_once()
+                # Use utc_now() to match whisper's meeting_started_at clock source
+                speaker_repo.add_frame(utc_now(), result.participants)
+            except Exception:
+                logger.exception("Vision engine polling failed")
+            # Poll at 2Hz
+            time.sleep(0.5)
 
     def get_status(self) -> MeetingState:
         """Return whether exactly one meeting is currently running."""
@@ -67,6 +93,11 @@ class MeetingService:
                     whisper_service=self._whisper_service,
                 )
             )
+            
+            self._vision_running = True
+            self._vision_thread = threading.Thread(target=self._vision_loop, daemon=True)
+            self._vision_thread.start()
+
             try:
                 self._audio_service.start_recording(AudioSource.MICROPHONE)
             except Exception:
@@ -85,6 +116,11 @@ class MeetingService:
             if running_meeting is None:
                 return MeetingState(running=False)
 
+            self._vision_running = False
+            if self._vision_thread is not None:
+                self._vision_thread.join(timeout=2.0)
+                self._vision_thread = None
+
             self._audio_service.stop_recording()
             self._audio_service.set_chunk_handler(None)
             running_meeting.status = MeetingStatus.COMPLETED
@@ -95,6 +131,13 @@ class MeetingService:
             except Exception:
                 logger.exception(
                     "Meeting stopped but summary generation failed",
+                    extra={"meeting_id": running_meeting.id},
+                )
+            try:
+                self._action_item_service.extract_for_meeting(running_meeting.id)
+            except Exception:
+                logger.exception(
+                    "Meeting stopped but action-item extraction failed",
                     extra={"meeting_id": running_meeting.id},
                 )
             logger.info("Meeting stopped", extra={"meeting_id": running_meeting.id})

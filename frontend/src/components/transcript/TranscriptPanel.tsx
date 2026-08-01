@@ -1,22 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import api from "../../services/api";
 
-type TranscriptEntry = {
-  id: number;
-  meeting_id: number;
-  chunk_index: number;
-  text: string;
-  start_seconds: number;
-  end_seconds: number;
-  language: string;
-  confidence: number | null;
-};
+type TranscriptEntry = { id: number; meeting_id: number; chunk_index: number; segment_index?: number; text: string; start_seconds: number; end_seconds: number; language: string; confidence: number | null; speaker_id?: string | null; speaker_name?: string | null; speaker_confidence?: number | null };
 
-type TranscriptPanelProps = {
-  onSummaryGenerated: (content: string | null) => void;
-};
+type TranscriptPanelProps = { onMeetingStopped: (meetingId: number) => void };
 
-function TranscriptPanel({ onSummaryGenerated }: TranscriptPanelProps) {
+function TranscriptPanel({ onMeetingStopped }: TranscriptPanelProps) {
   const [running, setRunning] = useState(false);
   const [transcripts, setTranscripts] = useState<TranscriptEntry[]>([]);
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -73,8 +62,7 @@ function TranscriptPanel({ onSummaryGenerated }: TranscriptPanelProps) {
       setRunning(false);
       const meetingId = response.headers["x-meeting-id"];
       if (meetingId) {
-        const summary = await api.get(`/meeting/${meetingId}/summary`);
-        onSummaryGenerated(summary.data.content);
+        onMeetingStopped(Number(meetingId));
       }
     } catch (error) {
       console.error(error);
@@ -85,7 +73,18 @@ function TranscriptPanel({ onSummaryGenerated }: TranscriptPanelProps) {
     return transcripts.map((entry) => (
       <div key={entry.id} className="rounded-lg border border-slate-800 bg-slate-950/80 p-3 text-sm text-slate-300">
         <div className="mb-1 flex items-center justify-between text-xs uppercase tracking-wide text-slate-500">
-          <span>Speaker Placeholder</span>
+          <span className="flex items-center gap-2">
+            {entry.speaker_name && entry.speaker_name !== "Unknown" ? (
+              <>
+                <span className="text-slate-300 font-semibold">{entry.speaker_name}</span>
+                {entry.speaker_confidence !== null && entry.speaker_confidence !== undefined && entry.speaker_confidence < 0.5 && (
+                  <span className="bg-yellow-900/50 text-yellow-500 px-1.5 py-0.5 rounded text-[10px]">Low Conf</span>
+                )}
+              </>
+            ) : (
+              <span>Unknown Speaker</span>
+            )}
+          </span>
           <span>{entry.start_seconds.toFixed(1)}s</span>
         </div>
         <div>{entry.text}</div>

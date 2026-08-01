@@ -21,7 +21,7 @@ class TranscriptPersistencePipeline:
         self._whisper_service = whisper_service
         self._transcript_service = transcript_service
 
-    def handle_audio_chunk(self, audio_chunk: AudioChunk) -> Transcript:
+    def handle_audio_chunk(self, audio_chunk: AudioChunk) -> list[Transcript]:
         """Transcribe and persist one completed WAV chunk."""
         logger.info("Whisper started", extra={"path": str(audio_chunk.path), "chunk_index": audio_chunk.chunk_index})
         result = self._whisper_service.transcribe_chunk(audio_chunk.path)
