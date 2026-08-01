@@ -1,11 +1,9 @@
 fastapi
-httpx2
 uvicorn[standard]
 python-dotenv
-sqlalchemy>=2.0,<2.1
+sqlalchemy
 pydantic
-pydantic-settings
-numpy
-soundcard
-faster-whisper
 websockets
+mss
+opencv-python
+easyocr
