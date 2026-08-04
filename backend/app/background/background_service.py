@@ -77,6 +77,11 @@ class BackgroundService:
         self.meeting_detector = MeetingDetectionModule(self.event_bus)
         self.register_module("meeting_detector", self.meeting_detector)
         
+        # Auto-register RecordingManager
+        from app.background.recording.recording_manager import RecordingManager
+        self.recording_manager = RecordingManager.get_instance(self.event_bus)
+        self.register_module("recording_manager", self.recording_manager)
+        
         self.last_heartbeat: datetime | None = None
         self.last_error: str | None = None
         
