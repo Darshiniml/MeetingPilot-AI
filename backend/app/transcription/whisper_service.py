@@ -94,6 +94,14 @@ class WhisperService:
             processing_seconds=processing_seconds,
             average_processing_seconds=average_processing_seconds,
         )
+        print(f"Whisper language: {result.language}", flush=True)
+        print(f"Whisper segment count: {len(result.segments)}", flush=True)
+        print(f"Transcript text: {result.text}", flush=True)
+        logger.info(f"Detected language: {result.language}")
+        logger.info(f"Segment count: {len(result.segments)}")
+        if len(result.segments) == 0:
+            logger.warning(f"Whisper transcription returned 0 segments for chunk {audio_path.name} (possibly due to silence or VAD filter).")
+        logger.info(f"Transcript length: {len(result.text)}")
         logger.info(
             "Audio chunk transcribed",
             extra={

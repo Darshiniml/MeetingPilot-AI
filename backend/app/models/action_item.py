@@ -30,6 +30,7 @@ class ActionItem(Base):
         DateTime(timezone=True),
         nullable=True,
     )
+    priority: Mapped[str | None] = mapped_column(String(32), nullable=True)
     is_completed: Mapped[bool] = mapped_column(
         Boolean,
         nullable=False,

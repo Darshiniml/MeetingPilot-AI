@@ -38,6 +38,20 @@ class TranscriptService:
             
             speaker_id, speaker_name, speaker_conf = alignment_service.align_speaker(abs_start, abs_end)
             
+            print("Persisting transcript", flush=True)
+            print(f"Meeting ID: {meeting_id}", flush=True)
+            print(f"Chunk Index: {audio_chunk.chunk_index}", flush=True)
+            print(f"Segment Index: {i}", flush=True)
+            print(f"Text: {segment.text}", flush=True)
+            print(f"Speaker: {speaker_name} (ID: {speaker_id})", flush=True)
+            print(f"Rows inserted: 1 (segment {i+1}/{len(whisper_result.segments)})", flush=True)
+            logger.info("Persisting transcript")
+            logger.info(f"Meeting ID: {meeting_id}")
+            logger.info(f"Chunk Index: {audio_chunk.chunk_index}")
+            logger.info(f"Segment Index: {i}")
+            logger.info(f"Text: {segment.text}")
+            logger.info(f"Speaker: {speaker_name} (ID: {speaker_id})")
+            
             transcript = self._transcript_repository.create_transcript(
                 meeting_id=meeting_id,
                 chunk_index=audio_chunk.chunk_index,
@@ -51,6 +65,8 @@ class TranscriptService:
                 speaker_name=speaker_name,
                 speaker_confidence=speaker_conf,
             )
+            print("Transcript saved", flush=True)
+            logger.info("Transcript saved")
             transcripts.append(transcript)
             logger.info("Transcript persisted", extra={"meeting_id": meeting_id, "transcript_id": transcript.id})
             self._broadcast_transcript(meeting_id=meeting_id, transcript=transcript)
@@ -73,6 +89,8 @@ class TranscriptService:
             "speaker_name": transcript.speaker_name,
             "speaker_confidence": transcript.speaker_confidence,
         }
+        print("Broadcasting websocket", flush=True)
+        logger.info("Broadcasting websocket")
         get_transcript_socket_manager().dispatch_transcript(
             meeting_id=meeting_id, transcript=payload
         )

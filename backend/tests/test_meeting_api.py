@@ -12,7 +12,14 @@ class MeetingApiTests(unittest.TestCase):
 
     def setUp(self) -> None:
         """Create an app client and reset shared in-memory state for each test."""
-        self.client = TestClient(create_app())
+        app = create_app()
+        from app.core.dependencies import get_current_user
+        from app.models.user import User
+        
+        mock_user = User(id=1, name="Test User", email="test@example.com", password_hash="hash")
+        app.dependency_overrides[get_current_user] = lambda: mock_user
+        
+        self.client = TestClient(app)
         self.client.post("/meeting/stop")
 
     def test_system_endpoints(self) -> None:

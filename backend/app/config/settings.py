@@ -21,6 +21,13 @@ class Settings(BaseSettings):
     summary_llm_provider: str = "ollama"
     summary_llm_model: str = "llama3.2"
     ollama_base_url: str = "http://127.0.0.1:11434"
+    ollama_embedding_model: str = "nomic-embed-text"
+
+    # Google OAuth Configuration
+    google_client_id: str = "mock-client-id"
+    google_client_secret: str = "mock-client-secret"
+    google_redirect_uri: str = "http://localhost:8000/integrations/google/callback"
+    google_token_encryption_key: str = "meetingpilot-default-secret-key-32b-must-change"
 
     model_config = SettingsConfigDict(
         env_file=".env",

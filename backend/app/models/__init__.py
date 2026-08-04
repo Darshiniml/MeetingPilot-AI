@@ -8,6 +8,9 @@ from app.models.action_item import ActionItem
 from app.models.meeting import Meeting, MeetingState, MeetingStatus
 from app.models.summary import Summary
 from app.models.transcript import Transcript
+from app.models.google_calendar_token import GoogleCalendarToken
+from app.models.email_log import EmailLog
+from app.contacts.contact_model import Contact
 
 __all__ = [
     "ActionItem",
@@ -16,4 +19,7 @@ __all__ = [
     "MeetingStatus",
     "Summary",
     "Transcript",
+    "GoogleCalendarToken",
+    "EmailLog",
+    "Contact",
 ]

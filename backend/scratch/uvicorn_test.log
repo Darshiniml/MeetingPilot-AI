@@ -1,0 +1,316 @@
+Failed to patch torch compatibility: No module named 'torch'
+INFO:     Started server process [30968]
+INFO:     Waiting for application startup.
+2026-08-01 20:00:42,583 [INFO] app.database.initialization: Running database migrations...
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+Recording started
+Recording thread running
+Frame received
+Audio frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Chunk threshold reached
+Chunk written
+Chunk path: C:\Users\Varshini\AppData\Local\Temp\meetingpilot\audio\65335367b55044fbb367e9cb74624c5b\microphone_00000_20260801T143109Z.wav
+Chunk index: 0
+Chunk duration: 10.0s
+Chunk size: 320000 bytes
+Audio RMS: 0.000000
+Maximum amplitude: 0.000000
+Whisper started
+Whisper path: C:\Users\Varshini\AppData\Local\Temp\meetingpilot\audio\65335367b55044fbb367e9cb74624c5b\microphone_00000_20260801T143109Z.wav
+Meeting ID: 50
+Chunk Index: 0
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Whisper language: en
+Whisper segment count: 0
+Transcript text: 
+Whisper finished
+Transcript text length: 0
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Chunk threshold reached
+Chunk written
+Chunk path: C:\Users\Varshini\AppData\Local\Temp\meetingpilot\audio\65335367b55044fbb367e9cb74624c5b\microphone_00001_20260801T143119Z.wav
+Chunk index: 1
+Chunk duration: 10.0s
+Chunk size: 320000 bytes
+Audio RMS: 0.000000
+Maximum amplitude: 0.000000
+Whisper started
+Whisper path: C:\Users\Varshini\AppData\Local\Temp\meetingpilot\audio\65335367b55044fbb367e9cb74624c5b\microphone_00001_20260801T143119Z.wav
+Meeting ID: 50
+Chunk Index: 1
+Frame received
+Frame received
+C:\Users\Varshini\OneDrive\Desktop\MeetingPilot-AI\.venv\Lib\site-packages\soundcard\mediafoundation.py:772: SoundcardRuntimeWarning: data discontinuity in recording
+  warnings.warn("data discontinuity in recording", SoundcardRuntimeWarning)
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Whisper language: en
+Whisper segment count: 0
+Transcript text: 
+Whisper finished
+Transcript text length: 0
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Frame received
+Chunk written
+Chunk path: C:\Users\Varshini\AppData\Local\Temp\meetingpilot\audio\65335367b55044fbb367e9cb74624c5b\microphone_00002_20260801T143124Z.wav
+Chunk index: 2
+Chunk duration: 5.5s
+Chunk size: 176000 bytes
+Audio RMS: 0.000000
+Maximum amplitude: 0.000000
+Whisper started
+Whisper path: C:\Users\Varshini\AppData\Local\Temp\meetingpilot\audio\65335367b55044fbb367e9cb74624c5b\microphone_00002_20260801T143124Z.wav
+Meeting ID: 50
+Chunk Index: 2
+Whisper language: en
+Whisper segment count: 0
+Transcript text: 
+Whisper finished
+Transcript text length: 0

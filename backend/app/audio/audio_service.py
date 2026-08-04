@@ -8,7 +8,9 @@ from datetime import datetime, timedelta, timezone
 from app.audio.buffer import AudioChunk, AudioChunkBuffer, TemporaryWavChunkWriter
 from app.audio.capture import AudioCapture, AudioCaptureConfig
 from app.audio.devices import AudioDevice, AudioDeviceManager, AudioSource
+from app.websocket.manager import get_transcript_socket_manager
 import logging
+import numpy as np
 
 
 logger = logging.getLogger(__name__)
@@ -62,6 +64,8 @@ class AudioService:
             self._ensure_handler_worker()
             self._worker = Thread(target=self._capture_loop, name="audio-capture", daemon=True)
             self._worker.start()
+            print("Recording started", flush=True)
+            logger.info("Recording started")
             logger.info("Audio service started", extra={"source": source.value})
 
     def set_chunk_handler(self, chunk_handler: Callable[[AudioChunk], None] | None) -> None:
@@ -109,6 +113,10 @@ class AudioService:
             return
         raise error
 
+    def wait_for_chunk_processing(self) -> None:
+        """Wait until the queued Whisper jobs for the stopped session finish."""
+        self._handler_jobs.join()
+
     def _capture_loop(self) -> None:
         """Read responsive frames and emit WAV chunks every ten seconds."""
         capture = self._capture
@@ -121,14 +129,26 @@ class AudioService:
         writer = TemporaryWavChunkWriter()
         next_chunk_started_at = datetime.now(timezone.utc)
         frame_count = 0
+        print("Recording thread running", flush=True)
         logger.info("Recording thread running")
         try:
             while not self._stop_event.is_set():
                 frame = capture.read_frame()
+                # These values come from the PCM frame actually received from WASAPI.
+                # They are sent to the UI instead of rendering a synthetic waveform.
+                get_transcript_socket_manager().dispatch_audio_level(
+                    rms=float(np.sqrt(np.mean(np.square(frame)))) if frame.size else 0.0,
+                    peak=float(np.max(np.abs(frame))) if frame.size else 0.0,
+                )
                 frame_count += 1
+                print("Frame received", flush=True)
+                logger.info("Frame received")
                 if frame_count == 1:
+                    print("Audio frame received", flush=True)
                     logger.info("Audio frame received")
                 for samples in buffer.append(frame):
+                    print("Chunk threshold reached", flush=True)
+                    logger.info("Chunk threshold reached")
                     chunk = writer.write(
                         samples,
                         source=self._selected_source(),

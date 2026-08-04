@@ -5,7 +5,7 @@ import time
 import threading
 from collections.abc import Callable
 from datetime import datetime
-from threading import RLock
+from threading import RLock, Thread
 
 from app.audio.audio_service import AudioService
 from app.audio.buffer import AudioChunk
@@ -39,7 +39,7 @@ class MeetingService:
         whisper_service: WhisperService,
         chunk_processor_factory: Callable[..., Callable[[AudioChunk], None]],
         summary_service: SummaryService,
-        action_item_service: ActionItemService,
+        post_processing_runner: Callable[[int], None],
     ) -> None:
         """Initialize the service with its sole persistence collaborator."""
         self._meeting_repository = meeting_repository
@@ -47,7 +47,7 @@ class MeetingService:
         self._whisper_service = whisper_service
         self._chunk_processor_factory = chunk_processor_factory
         self._summary_service = summary_service
-        self._action_item_service = action_item_service
+        self._post_processing_runner = post_processing_runner
         
         self._vision_running = False
         self._vision_thread: threading.Thread | None = None
@@ -99,7 +99,9 @@ class MeetingService:
             self._vision_thread.start()
 
             try:
-                self._audio_service.start_recording(AudioSource.MICROPHONE)
+                # Meetings transcribe browser/system playback through the default
+                # WASAPI speaker loopback, not the physical microphone endpoint.
+                self._audio_service.start_recording(AudioSource.SYSTEM_AUDIO)
             except Exception:
                 self._audio_service.set_chunk_handler(None)
                 meeting.status = MeetingStatus.COMPLETED
@@ -126,22 +128,25 @@ class MeetingService:
             running_meeting.status = MeetingStatus.COMPLETED
             running_meeting.ended_at = utc_now()
             self._meeting_repository.update_meeting(running_meeting)
-            try:
-                self._summary_service.generate_for_meeting(running_meeting.id)
-            except Exception:
-                logger.exception(
-                    "Meeting stopped but summary generation failed",
-                    extra={"meeting_id": running_meeting.id},
-                )
-            try:
-                self._action_item_service.extract_for_meeting(running_meeting.id)
-            except Exception:
-                logger.exception(
-                    "Meeting stopped but action-item extraction failed",
-                    extra={"meeting_id": running_meeting.id},
-                )
+            Thread(
+                target=self._run_post_processing,
+                args=(running_meeting.id,),
+                name=f"meeting-post-processing-{running_meeting.id}",
+                daemon=True,
+            ).start()
             logger.info("Meeting stopped", extra={"meeting_id": running_meeting.id})
             return MeetingState(running=False, meeting_id=running_meeting.id)
+
+    def _run_post_processing(self, meeting_id: int) -> None:
+        """Generate summaries after stop without delaying the stop API response."""
+        try:
+            self._audio_service.wait_for_chunk_processing()
+            self._post_processing_runner(meeting_id)
+        except Exception:
+            logger.exception(
+                "Meeting stopped but post-processing failed",
+                extra={"meeting_id": meeting_id},
+            )
 
     def get_summary(self, meeting_id: int):
         """Return a completed meeting's generated summary, if available."""

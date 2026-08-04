@@ -94,6 +94,24 @@ class TemporaryWavChunkWriter:
             wav_file.setsampwidth(2)
             wav_file.setframerate(sample_rate)
             wav_file.writeframes(pcm_samples.tobytes())
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info("Chunk written")
+        logger.info(f"Chunk path: {path}")
+        logger.info(f"Chunk duration: {len(pcm_samples) / sample_rate}s")
+        logger.info(f"Chunk index: {chunk_index}")
+        
+        max_amplitude = float(np.max(np.abs(samples))) if len(samples) > 0 else 0.0
+        rms_amplitude = float(np.sqrt(np.mean(samples**2))) if len(samples) > 0 else 0.0
+        duration = len(pcm_samples) / sample_rate
+        size_bytes = pcm_samples.nbytes
+        print("Chunk written", flush=True)
+        print(f"Chunk path: {path}", flush=True)
+        print(f"Chunk index: {chunk_index}", flush=True)
+        print(f"Chunk duration: {duration}s", flush=True)
+        print(f"Chunk size: {size_bytes} bytes", flush=True)
+        print(f"Audio RMS: {rms_amplitude:.6f}", flush=True)
+        print(f"Maximum amplitude: {max_amplitude:.6f}", flush=True)
         return AudioChunk(
             path=path,
             source=source,

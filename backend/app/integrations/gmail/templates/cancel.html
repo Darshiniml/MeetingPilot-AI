@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Meeting Cancelled: {{ title }}</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f4f5f7;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid #e1e4e8;
+        }
+        .header {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px;
+            line-height: 1.6;
+        }
+        .details-box {
+            background-color: #f8fafc;
+            border-left: 4px solid #ef4444;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .details-row {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+        .details-label {
+            font-weight: bold;
+            color: #9ca3af;
+        }
+        .footer {
+            background-color: #f9fafb;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Meeting Cancelled</h1>
+        </div>
+        <div class="content">
+            <p>Hello,</p>
+            <p>Please note that the following meeting has been cancelled:</p>
+            
+            <div class="details-box">
+                <div class="details-row"><span class="details-label">Subject:</span> {{ title }}</div>
+                <div class="details-row"><span class="details-label">Date:</span> {{ date }}</div>
+                <div class="details-row"><span class="details-label">Time:</span> {{ time }} ({{ timezone }})</div>
+                <div class="details-row"><span class="details-label">Duration:</span> {{ duration }}</div>
+            </div>
+
+            <div>
+                {{ content }}
+            </div>
+        </div>
+        <div class="footer">
+            Sent by MeetingPilot AI &bull; Your Agentic Coding Assistant
+        </div>
+    </div>
+</body>
+</html>

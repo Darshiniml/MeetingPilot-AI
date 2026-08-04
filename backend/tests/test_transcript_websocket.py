@@ -14,8 +14,11 @@ class TranscriptWebsocketTests(unittest.TestCase):
 
     def test_transcript_websocket_broadcasts_chunks(self) -> None:
         """Clients receive transcript events without polling."""
+        from app.core.security import create_access_token
+        token = create_access_token(subject=1)
+        
         with TestClient(create_app()) as client:
-            with client.websocket_connect("/ws/transcript") as websocket:
+            with client.websocket_connect(f"/ws/transcript?token={token}") as websocket:
                 connected_message = websocket.receive_json()
                 self.assertEqual(connected_message["type"], "connected")
 

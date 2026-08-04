@@ -19,7 +19,14 @@ class TranscriptRepository:
         """Create and persist one Whisper transcription segment."""
         transcript = Transcript(meeting_id=meeting_id, chunk_index=chunk_index, segment_index=segment_index, text=text, start_seconds=start_seconds, end_seconds=end_seconds, language=language, confidence=confidence, speaker_id=speaker_id, speaker_name=speaker_name, speaker_confidence=speaker_confidence)
         self._session.add(transcript)
-        return self._commit_and_refresh(transcript)
+        res = self._commit_and_refresh(transcript)
+        import logging
+        from sqlalchemy import func
+        count = self._session.query(func.count(Transcript.id)).scalar()
+        print(f"SELECT COUNT(*) FROM transcripts; -> {count}", flush=True)
+        print(f"Current transcript count: {count}", flush=True)
+        logging.getLogger(__name__).info(f"SELECT COUNT(*) FROM transcripts; -> {count}")
+        return res
 
     def list_transcripts_for_meeting(self, meeting_id: int) -> Sequence[Transcript]:
         """Return a meeting's chunks in chronological order."""

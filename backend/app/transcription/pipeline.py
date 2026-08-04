@@ -23,7 +23,15 @@ class TranscriptPersistencePipeline:
 
     def handle_audio_chunk(self, audio_chunk: AudioChunk) -> list[Transcript]:
         """Transcribe and persist one completed WAV chunk."""
-        logger.info("Whisper started", extra={"path": str(audio_chunk.path), "chunk_index": audio_chunk.chunk_index})
+        print("Whisper started", flush=True)
+        print(f"Whisper path: {audio_chunk.path}", flush=True)
+        print(f"Meeting ID: {self._meeting_id}", flush=True)
+        print(f"Chunk Index: {audio_chunk.chunk_index}", flush=True)
+        logger.info("Whisper started")
+        logger.info(f"Whisper path: {audio_chunk.path}")
         result = self._whisper_service.transcribe_chunk(audio_chunk.path)
-        logger.info("Transcript generated", extra={"chunk_index": audio_chunk.chunk_index, "text_length": len(result.text)})
+        print("Whisper finished", flush=True)
+        print(f"Transcript text length: {len(result.text)}", flush=True)
+        logger.info("Whisper finished")
+        logger.info(f"Transcript text length: {len(result.text)}")
         return self._transcript_service.persist_whisper_result(meeting_id=self._meeting_id, meeting_started_at=self._meeting_started_at, audio_chunk=audio_chunk, whisper_result=result)

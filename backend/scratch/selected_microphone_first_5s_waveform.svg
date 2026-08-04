@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
+<rect width="100%" height="100%" fill="white"/>
+<text x="600.0" y="25" text-anchor="middle" font-family="Arial" font-size="18">Selected Microphone ? 5 Second PCM Waveform</text>
+<line x1="80" y1="45" x2="80" y2="355" stroke="#222"/>
+<line x1="80" y1="355" x2="1170" y2="355" stroke="#222"/>
+<line x1="80.0" y1="45" x2="80.0" y2="355" stroke="#ddd"/>
+<text x="80.0" y="380" text-anchor="middle" font-family="Arial" font-size="12">0</text>
+<line x1="298.0" y1="45" x2="298.0" y2="355" stroke="#ddd"/>
+<text x="298.0" y="380" text-anchor="middle" font-family="Arial" font-size="12">1</text>
+<line x1="516.0" y1="45" x2="516.0" y2="355" stroke="#ddd"/>
+<text x="516.0" y="380" text-anchor="middle" font-family="Arial" font-size="12">2</text>
+<line x1="734.0" y1="45" x2="734.0" y2="355" stroke="#ddd"/>
+<text x="734.0" y="380" text-anchor="middle" font-family="Arial" font-size="12">3</text>
+<line x1="952.0" y1="45" x2="952.0" y2="355" stroke="#ddd"/>
+<text x="952.0" y="380" text-anchor="middle" font-family="Arial" font-size="12">4</text>
+<line x1="1170.0" y1="45" x2="1170.0" y2="355" stroke="#ddd"/>
+<text x="1170.0" y="380" text-anchor="middle" font-family="Arial" font-size="12">5</text>
+<line x1="80" y1="45" x2="1170" y2="45" stroke="#ddd"/>
+<text x="70" y="49" text-anchor="end" font-family="Arial" font-size="12">1.0</text>
+<line x1="80" y1="200.0" x2="1170" y2="200.0" stroke="#ddd"/>
+<text x="70" y="204.0" text-anchor="end" font-family="Arial" font-size="12">0.0</text>
+<line x1="80" y1="355" x2="1170" y2="355" stroke="#ddd"/>
+<text x="70" y="359" text-anchor="end" font-family="Arial" font-size="12">-1.0</text>
+<polyline points="80,200.0 1170,200.0" fill="none" stroke="#2563eb" stroke-width="2"/>
+<text x="600.0" y="408" text-anchor="middle" font-family="Arial" font-size="14">Time (seconds)</text>
+<text x="18" y="200.0" transform="rotate(-90 18 200.0)" text-anchor="middle" font-family="Arial" font-size="14">Amplitude</text>
+</svg>

@@ -1,5 +1,6 @@
-"""AI agent orchestration boundary.
+"""Supervisor-coordinated specialized agents built on reusable agent tools."""
 
-Future transcript, summarization, action-item, retrieval, and chat agents will
-be composed here behind provider-agnostic interfaces.
-"""
+from .agent_registry import AgentRegistry
+from .supervisor_agent import SupervisorAgent
+
+__all__ = ["AgentRegistry", "SupervisorAgent"]

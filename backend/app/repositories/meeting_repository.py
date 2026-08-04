@@ -13,9 +13,16 @@ from app.models.meeting import Meeting, MeetingStatus
 class MeetingRepository:
     """Persist and retrieve Meeting entities using an injected SQLAlchemy session."""
 
-    def __init__(self, session: Session) -> None:
-        """Initialize the repository with the current request's database session."""
+    def __init__(self, session: Session, user_id: int | None = None) -> None:
+        """Initialize the repository with the current request's database session and user_id."""
         self._session = session
+        self._user_id = user_id
+
+    def _base_query(self) -> Select:
+        statement = select(Meeting)
+        if self._user_id is not None:
+            statement = statement.where(Meeting.user_id == self._user_id)
+        return statement
 
     def create_meeting(
         self,
@@ -29,15 +36,14 @@ class MeetingRepository:
             title=title,
             status=status,
             started_at=started_at,
+            user_id=self._user_id,
         )
         self._session.add(meeting)
         return self._commit_and_refresh(meeting)
 
     def get_meeting_by_id(self, meeting_id: int) -> Meeting | None:
         """Return a meeting by primary key, or None when it does not exist."""
-        statement: Select[tuple[Meeting]] = select(Meeting).where(
-            Meeting.id == meeting_id
-        )
+        statement = self._base_query().where(Meeting.id == meeting_id)
         return self._session.execute(statement).scalars().first()
 
     def get_running_meeting(self) -> Meeting | None:
@@ -50,8 +56,8 @@ class MeetingRepository:
         if not 1 <= limit <= 500:
             raise ValueError("limit must be between 1 and 500")
 
-        statement: Select[tuple[Meeting]] = (
-            select(Meeting)
+        statement = (
+            self._base_query()
             .where(Meeting.status == MeetingStatus.RUNNING)
             .order_by(Meeting.started_at.desc(), Meeting.id.desc())
             .limit(limit)
@@ -74,8 +80,8 @@ class MeetingRepository:
         if not 1 <= limit <= 500:
             raise ValueError("limit must be between 1 and 500")
 
-        statement: Select[tuple[Meeting]] = (
-            select(Meeting)
+        statement = (
+            self._base_query()
             .order_by(Meeting.created_at.desc(), Meeting.id.desc())
             .offset(offset)
             .limit(limit)

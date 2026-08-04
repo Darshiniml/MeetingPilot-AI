@@ -39,6 +39,18 @@ class TranscriptSocketManager:
         for websocket in dead_connections:
             self._connections.discard(websocket)
 
+    async def broadcast_audio_level(self, *, rms: float, peak: float) -> None:
+        """Send measured microphone amplitude to connected live-meeting clients."""
+        payload = {"type": "audio_level", "rms": rms, "peak": peak}
+        dead_connections: list[WebSocket] = []
+        for websocket in list(self._connections):
+            try:
+                await websocket.send_json(payload)
+            except Exception:
+                dead_connections.append(websocket)
+        for websocket in dead_connections:
+            self._connections.discard(websocket)
+
     def dispatch_transcript(self, *, meeting_id: int, transcript: dict[str, Any]) -> None:
         """Schedule a broadcast on the ASGI loop from either request or worker threads."""
         if not self._connections or self._event_loop is None:
@@ -52,6 +64,20 @@ class TranscriptSocketManager:
             current_loop.create_task(coroutine)
             return
         asyncio.run_coroutine_threadsafe(coroutine, self._event_loop).result(timeout=5)
+
+    def dispatch_audio_level(self, *, rms: float, peak: float) -> None:
+        """Schedule an audio-level update from the capture worker thread."""
+        if not self._connections or self._event_loop is None:
+            return
+        coroutine = self.broadcast_audio_level(rms=rms, peak=peak)
+        try:
+            current_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            current_loop = None
+        if current_loop is self._event_loop:
+            current_loop.create_task(coroutine)
+            return
+        asyncio.run_coroutine_threadsafe(coroutine, self._event_loop)
 
 
 _transcript_socket_manager: TranscriptSocketManager | None = None
