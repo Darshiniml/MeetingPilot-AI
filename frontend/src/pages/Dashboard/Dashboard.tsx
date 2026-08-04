@@ -14,6 +14,7 @@ import AgentCenter from "../Agents/AgentCenter";
 import MCPCenter from "../MCP/MCPCenter";
 import A2ACenter from "../A2A/A2ACenter";
 import ApprovalCenter from "../Approvals/ApprovalCenter";
+import AgentControlCenterPage from "../AgentControlCenter/AgentControlCenterPage";
 
 // History components
 import MeetingHistoryPanel from "../../components/history/MeetingHistoryPanel";
@@ -129,6 +130,10 @@ function Dashboard() {
 
           {activeView === "Approvals" && (
             <ApprovalCenter />
+          )}
+
+          {activeView === "Agent Control Center" && (
+            <AgentControlCenterPage />
           )}
 
           {activeView === "Meeting History" && (

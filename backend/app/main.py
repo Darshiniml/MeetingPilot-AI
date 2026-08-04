@@ -22,6 +22,7 @@ from app.websocket.transcript_socket import router as transcript_socket_router
 from app.copilot.copilot_service import router as copilot_socket_router
 from app.a2a.a2a_server import a2a_router
 from app.api.provider_routes import router as provider_router
+from app.agent_monitor.agent_routes import router as agent_router
 
 
 @asynccontextmanager
@@ -73,6 +74,7 @@ def create_app() -> FastAPI:
     application.include_router(copilot_socket_router)
     application.include_router(a2a_router)
     application.include_router(provider_router)
+    application.include_router(agent_router)
     return application
 
 

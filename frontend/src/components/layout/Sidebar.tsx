@@ -43,6 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onSelectView }) =>
     {
       title: "Platform OS",
       items: [
+        { id: 'Agent Control Center', label: 'Mission Control', icon: <Cpu size={16} /> },
         { id: 'Agents', label: 'Agent Center', icon: <Cpu size={16} /> },
         { id: 'Workflows', label: 'Workflow Center', icon: <GitBranch size={16} /> },
         { id: 'Approvals', label: 'Approvals', icon: <CheckSquare size={16} /> }
