@@ -12,6 +12,8 @@ from app.models.google_calendar_token import GoogleCalendarToken
 from app.models.email_log import EmailLog
 from app.contacts.contact_model import Contact
 
+from app.models.provider_models import ProviderConfig, LocalCalendarEvent, LocalEmail, LocalNotification
+
 __all__ = [
     "ActionItem",
     "Meeting",
@@ -22,4 +24,8 @@ __all__ = [
     "GoogleCalendarToken",
     "EmailLog",
     "Contact",
+    "ProviderConfig",
+    "LocalCalendarEvent",
+    "LocalEmail",
+    "LocalNotification",
 ]

@@ -141,18 +141,9 @@ def get_scheduler_service(session: DatabaseSession, user: CurrentUser) -> Schedu
     """Build the AI Meeting Scheduler service."""
     llm = get_llm_provider()
     
-    from app.integrations.google_calendar.token_store import TokenStore
-    from app.integrations.google_calendar.calendar_provider import GoogleCalendarProvider
-    
-    token_store = TokenStore(session)
-    token_record = token_store.get_token(user.id)
-    
-    if token_record and token_record.is_connected:
-        calendar_provider = GoogleCalendarProvider(session, user_id=user.id)
-    else:
-        calendar_provider = MockCalendarProvider()
-        
-    email_provider = get_gmail_provider(session, user)
+    from app.providers import get_calendar_provider, get_email_provider
+    calendar_provider = get_calendar_provider(session, user.id)
+    email_provider = get_email_provider(session, user.id)
         
     return SchedulerService(
         session=session,

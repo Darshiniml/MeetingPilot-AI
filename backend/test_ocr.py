@@ -11,6 +11,11 @@ try:
 except ImportError:
     cv2 = None
 
+try:
+    import easyocr
+except ImportError:
+    easyocr = None
+
 from app.vision.config import VisionConfig
 from app.vision.models import BoundingBox, CaptureFrame, MeetingWindow, Participant, VisionResult
 from app.vision.ocr_detector import OcrDetector
@@ -20,7 +25,7 @@ from app.vision.vision_service import VisionService
 class TestOcrDetector(unittest.TestCase):
     """Tests the standalone EasyOCR detector cropping and parsing logic."""
 
-    @unittest.skipIf(cv2 is None, "OpenCV not available")
+    @unittest.skipIf(cv2 is None or easyocr is None, "OpenCV or EasyOCR not available")
     def test_detect_name_synthetic(self) -> None:
         """Verify that OCR can read drawn text from a synthetic participant crop."""
         # Create a blank image and draw text

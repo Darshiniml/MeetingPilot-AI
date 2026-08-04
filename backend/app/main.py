@@ -21,6 +21,7 @@ from app.transcription.whisper_service import get_whisper_service
 from app.websocket.transcript_socket import router as transcript_socket_router
 from app.copilot.copilot_service import router as copilot_socket_router
 from app.a2a.a2a_server import a2a_router
+from app.api.provider_routes import router as provider_router
 
 
 @asynccontextmanager
@@ -71,6 +72,7 @@ def create_app() -> FastAPI:
     application.include_router(transcript_socket_router)
     application.include_router(copilot_socket_router)
     application.include_router(a2a_router)
+    application.include_router(provider_router)
     return application
 
 
