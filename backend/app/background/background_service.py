@@ -71,6 +71,12 @@ class BackgroundService:
         # Registry for pluggable background modules
         self._modules: dict[str, Any] = {}
         self._module_lock = RLock()
+        
+        # Auto-register MeetingDetectionModule
+        from app.background.meeting_detection.meeting_detector import MeetingDetectionModule
+        self.meeting_detector = MeetingDetectionModule(self.event_bus)
+        self.register_module("meeting_detector", self.meeting_detector)
+        
         self.last_heartbeat: datetime | None = None
         self.last_error: str | None = None
         

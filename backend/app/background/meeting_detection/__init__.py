@@ -1,0 +1,6 @@
+from __future__ import annotations
+
+from app.background.meeting_detection import meeting_events
+from app.background.meeting_detection.meeting_detector import MeetingDetectionModule
+from app.background.meeting_detection.meeting_registry import MeetingSession, MeetingPlatformProfile, MeetingPlatformRegistry
+from app.background.meeting_detection.meeting_events import MeetingDetectedEvent, MeetingLostEvent
