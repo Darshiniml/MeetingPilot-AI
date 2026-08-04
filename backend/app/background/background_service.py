@@ -200,16 +200,16 @@ class BackgroundService:
         self.metrics.increment_events()
 
     def start_recording(self) -> None:
-        """Publish recording started signal."""
-        logger.info("[Background Agent] Manual start recording hotkey callback.")
-        self.event_bus.publish(RecordingStartedEvent(user_id=1))
+        """Manually start the recording pipeline."""
+        logger.info("[Background Agent] Manual start recording callback triggered.")
+        self.recording_manager.start_recording_pipeline("Manual")
         self.metrics.increment_events()
         self.tray.update_menu_state(is_paused=self.state_manager.get_state() == BackgroundState.PAUSED, is_recording=True)
 
     def stop_recording(self) -> None:
-        """Publish recording stopped signal."""
-        logger.info("[Background Agent] Manual stop recording hotkey callback.")
-        self.event_bus.publish(RecordingStoppedEvent(user_id=1))
+        """Manually stop the recording pipeline."""
+        logger.info("[Background Agent] Manual stop recording callback triggered.")
+        self.recording_manager.stop_recording_pipeline()
         self.metrics.increment_events()
         self.tray.update_menu_state(is_paused=self.state_manager.get_state() == BackgroundState.PAUSED, is_recording=False)
 

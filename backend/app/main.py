@@ -23,25 +23,28 @@ from app.copilot.copilot_service import router as copilot_socket_router
 from app.a2a.a2a_server import a2a_router
 from app.api.provider_routes import router as provider_router
 from app.agent_monitor.agent_routes import router as agent_router
+from app.background.background_service import get_background_service
 
 
 @asynccontextmanager
-async def lifespan(_application: FastAPI) -> AsyncIterator[None]:
-    """Initialize local infrastructure before the API accepts requests."""
-    import logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        force=True
-    )
+async def lifespan(app: FastAPI):
+
     create_database_tables()
-    settings = get_settings()
-    if settings.whisper_load_on_startup:
+
+    if get_settings().whisper_load_on_startup:
         get_whisper_service().warmup()
-    yield
-    get_whisper_service().shutdown()
 
+    background = get_background_service()
 
+    background.start()
+
+    print("✅ Background Agent Started")
+
+    try:
+        yield
+    finally:
+        background.stop()
+        get_whisper_service().shutdown()
 def create_app() -> FastAPI:
     """Create and configure the MeetingPilot ASGI application."""
     settings = get_settings()
