@@ -82,6 +82,11 @@ class BackgroundService:
         self.recording_manager = RecordingManager.get_instance(self.event_bus)
         self.register_module("recording_manager", self.recording_manager)
         
+        # Auto-register AutonomyEngine
+        from app.autonomy.autonomy_engine import AutonomyEngine
+        self.autonomy_engine = AutonomyEngine.get_instance(self.event_bus)
+        self.register_module("autonomy_engine", self.autonomy_engine)
+        
         self.last_heartbeat: datetime | None = None
         self.last_error: str | None = None
         
